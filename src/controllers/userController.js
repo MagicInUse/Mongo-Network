@@ -1,4 +1,5 @@
 import { User } from '../models/index.js';
+import { Thought } from '../models/index.js';
 
 /**
  * GET All Users /users
@@ -102,4 +103,26 @@ export const deleteUser = async (req, res) => {
       message: error.message
     });
   }
+};
+
+// BONUS: Delete a user and all associated thoughts
+export const deleteUserAndThoughts = async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const user = await User.findByIdAndDelete(userId);
+        if (user) {
+            await Thought.deleteMany({ userId: user._id });
+            res.json({
+                message: 'User and associated thoughts deleted successfully'
+            });
+        } else {
+            res.status(404).json({
+                message: 'User not found'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
 };

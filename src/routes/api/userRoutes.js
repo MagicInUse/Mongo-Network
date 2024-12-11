@@ -5,6 +5,7 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  deleteUserAndThoughts,
 } from '../../controllers/userController.js';
 
 const userRouter = Router();
@@ -18,8 +19,8 @@ userRouter
 // /api/users/:userId
 userRouter
   .route('/:userId')
-  .get(getUserById)
+  .get(getUserById).populate('thoughts').populate('friends')
   .put(updateUser)
-  .delete(deleteUser);
+  .delete(deleteUserAndThoughts);
 
 export default userRouter;
