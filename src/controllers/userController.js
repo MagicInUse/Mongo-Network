@@ -24,7 +24,7 @@ export const getAllUsers = async (_req, res) => {
 export const getUserById = async (req, res) => {
   const { userId } = req.params;
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate('thoughts').populate('friends');
     if (user) {
       res.json(user);
     } else {
@@ -107,22 +107,78 @@ export const deleteUser = async (req, res) => {
 
 // BONUS: Delete a user and all associated thoughts
 export const deleteUserAndThoughts = async (req, res) => {
-    const { userId } = req.params;
-    try {
-        const user = await User.findByIdAndDelete(userId);
-        if (user) {
-            await Thought.deleteMany({ userId: user._id });
-            res.json({
-                message: 'User and associated thoughts deleted successfully'
-            });
-        } else {
-            res.status(404).json({
-                message: 'User not found'
-            });
-        }
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+  const { userId } = req.params;
+  try {
+    const user = await User.findByIdAndDelete(userId);
+    if (user) {
+      await Thought.deleteMany({ username: user.username });
+      res.json({
+        message: 'User and associated thoughts deleted successfully'
+      });
+    } else {
+      res.status(404).json({
+        message: 'User not found'
+      });
     }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
+
+/**
+ * POST Add a friend to a User /users/:userId/friends/:friendId
+ * @param string userId
+ * @param string friendId
+ * @returns the updated User object
+ */
+export const addFriend = async (req, res) => {
+  const { userId, friendId } = req.params;
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { friends: friendId } },
+      { new: true }
+    ).populate('friends');
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({
+        message: 'User not found'
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
+
+/**
+ * DELETE Remove a friend from a User /users/:userId/friends/:friendId
+ * @param string userId
+ * @param string friendId
+ * @returns the updated User object
+ */
+export const deleteFriend = async (req, res) => {
+  const { userId, friendId } = req.params;
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { friends: friendId } },
+      { new: true }
+    ).populate('friends');
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({
+        message: 'User not found'
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
 };

@@ -23,4 +23,10 @@ userRouter
   .put(updateUser)
   .delete(deleteUserAndThoughts);
 
+// /api/users/:userId/friends/:friendId
+userRouter
+  .route('/:userId/friends/:friendId')
+  .post(addFriend)
+  .delete(deleteFriend);
+
 export default userRouter;
