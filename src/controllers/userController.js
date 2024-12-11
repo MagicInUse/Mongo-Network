@@ -24,7 +24,15 @@ export const getAllUsers = async (_req, res) => {
 export const getUserById = async (req, res) => {
   const { userId } = req.params;
   try {
-    const user = await User.findById(userId).populate('thoughts').populate('friends');
+    const user = await User.findById(userId)
+      .populate({
+        path: 'thoughts',
+        select: '-__v' // Exclude the __v field
+      })
+      .populate({
+        path: 'friends',
+        select: '-__v' // Exclude the __v field
+      });
     if (user) {
       res.json(user);
     } else {
@@ -171,6 +179,29 @@ export const deleteFriend = async (req, res) => {
     ).populate('friends');
     if (user) {
       res.json(user);
+    } else {
+      res.status(404).json({
+        message: 'User not found'
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
+
+/**
+ * GET All friends of a User /users/:userId/friends
+ * @param string userId
+ * @returns an array of friends
+ */
+export const getFriends = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const user = await User.findById(userId).populate('friends');
+    if (user) {
+      res.json(user.friends);
     } else {
       res.status(404).json({
         message: 'User not found'

@@ -5,6 +5,8 @@ import {
   createThought,
   updateThought,
   deleteThought,
+  addReaction,
+  deleteReaction
 } from '../../controllers/thoughtController.js';
 
 const thoughtRouter = Router();
