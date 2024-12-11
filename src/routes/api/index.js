@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import userRouter from './userRoutes.js';
+import userRouter from '../userRoutes.js';
+import thoughtRouter from '../thoughtRoutes.js'; // Import thought routes
 
 //For the testing purposes below
 import { User } from '../../models/index.js';
@@ -7,6 +8,7 @@ import { User } from '../../models/index.js';
 const apiRouter = Router();
 
 apiRouter.use('/users', userRouter);
+apiRouter.use('/thoughts', thoughtRouter); // Add thought routes
 
 // A couple API tests before really going off, to make sure that everything is connected properly:
 // GET /api/test
@@ -31,7 +33,5 @@ apiRouter.get('/magic', async (_req, res) => {
     res.status(500).send('Server error');
   }
 });
-
-
 
 export default apiRouter;
