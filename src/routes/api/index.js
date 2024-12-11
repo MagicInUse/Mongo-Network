@@ -1,18 +1,25 @@
 import { Router } from 'express';
+import userRouter from './userRoutes.js';
+
+//For the testing purposes below
 import { User } from '../../models/index.js';
 
 const apiRouter = Router();
 
+apiRouter.use('/users', userRouter);
+
+// A couple API tests before really going off, to make sure that everything is connected properly:
 // GET /api/test
+// API test route
 apiRouter.get('/test', (_req, res) => {
   res.send('API is working!');
 });
-
 // GET /api/magic
+// Live database query test route
 apiRouter.get('/magic', async (_req, res) => {
   try {
     console.log('Connecting to database...');
-    const user = await User.findById('6759e04fec3be75f60ee9c90').select('name');
+    const user = await User.findById('6759e7d5ec3be75f60ee9c92').select('name');
     console.log('Query result:', user);
     if (!user) {
       res.status(404).send('Student not found');
@@ -24,5 +31,7 @@ apiRouter.get('/magic', async (_req, res) => {
     res.status(500).send('Server error');
   }
 });
+
+
 
 export default apiRouter;
