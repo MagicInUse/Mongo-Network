@@ -7,7 +7,7 @@ import { Thought } from '../models/index.js';
  */
 export const getAllUsers = async (_req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().select('-__v'); // Exclude the __v field
     res.json(users);
   } catch (error) {
     res.status(500).json({
@@ -27,11 +27,11 @@ export const getUserById = async (req, res) => {
     const user = await User.findById(userId)
       .populate({
         path: 'thoughts',
-        select: '-__v' // Exclude the __v field
+        select: '-__v'
       })
       .populate({
         path: 'friends',
-        select: '-__v' // Exclude the __v field
+        select: '-__v'
       });
     if (user) {
       res.json(user);
@@ -148,7 +148,11 @@ export const addFriend = async (req, res) => {
       userId,
       { $addToSet: { friends: friendId } },
       { new: true }
-    ).populate('friends');
+    )
+    .populate({
+      path: 'friends',
+      select: '-__v' // Exclude the __v field
+    });
     if (user) {
       res.json(user);
     } else {
@@ -176,7 +180,11 @@ export const deleteFriend = async (req, res) => {
       userId,
       { $pull: { friends: friendId } },
       { new: true }
-    ).populate('friends');
+    )
+    .populate({
+      path: 'friends',
+      select: '-__v' // Exclude the __v field
+    });
     if (user) {
       res.json(user);
     } else {
@@ -199,7 +207,11 @@ export const deleteFriend = async (req, res) => {
 export const getFriends = async (req, res) => {
   const { userId } = req.params;
   try {
-    const user = await User.findById(userId).populate('friends');
+    const user = await User.findById(userId)
+      .populate({
+        path: 'friends',
+        select: '-__v' // Exclude the __v field
+      });
     if (user) {
       res.json(user.friends);
     } else {
